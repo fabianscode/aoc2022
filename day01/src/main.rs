@@ -17,4 +17,20 @@ fn main() {
     }).max().unwrap();
 
     println!("Max: {}", max);
+
+    ///////////// part 2 /////////////
+
+    let mut calories_sorted: Vec<i32> = all_elves_calories.iter().map(|s| {
+        let single_elve_calories = s.split("\n").collect::<Vec<&str>>();
+
+        single_elve_calories.iter().filter(|&x| !x.is_empty()).map(|&cal| { 
+            cal.parse::<i32>().unwrap() 
+        }).sum::<i32>()
+    }).collect::<Vec<i32>>();
+
+    calories_sorted.sort_by(|a, b| b.cmp(a));
+
+    let max_three: i32 = (&calories_sorted[0..3]).iter().sum();
+
+    println!("Max three: {}", max_three);
 }
