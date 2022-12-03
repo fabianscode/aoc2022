@@ -14,11 +14,11 @@ fn get_priority(c: char) -> i32{
     panic!("help");
 }
 
-fn get_common_item(rucksack: &str) -> char {
-    let (compartment1, compartment2) = (rucksack).split_at(rucksack.len() / 2);
+fn get_common_item(common_char_strings: Vec<&str>) -> char {
+    let str0: &str = common_char_strings[0];
 
-    for c in compartment1.chars() {
-        if compartment2.contains(c) {
+    for c in str0.chars() {
+        if common_char_strings[1..].iter().all(|s| s.contains(c)) {
             return c;
         }
     }
@@ -28,35 +28,23 @@ fn get_common_item(rucksack: &str) -> char {
 
 fn main() {
     let filepath = "inputfile";
-
-    let file_content: String = fs::read_to_string(filepath)
-            .expect("Unable to read file");
-
+    let file_content: String = fs::read_to_string(filepath).expect("Unable to read file");
     let rucksacks: Vec<&str> = file_content.split("\n").filter(|&x| !x.is_empty()).collect::<Vec<&str>>();
 
     let sum: i32 = rucksacks.iter().map(|s| {
-        let common_item: char = get_common_item(s);
+        let (compartment1, compartment2) = (s).split_at(s.len() / 2);
+        let common_item: char = get_common_item(vec![compartment1, compartment2]);
+
         return get_priority(common_item);
     }).sum();
 
     println!("Sum: {}", sum);
 
     //////////// part 2 ////////////
-    
-    let mut sum2: i32 = 0;
 
-    for i in (0..rucksacks.len()).step_by(3) {
-        let r1 = rucksacks[i];
-        let r2 = rucksacks[i + 1];
-        let r3 = rucksacks[i + 2];
-
-        for c in r1.chars() {
-            if r2.contains(c) && r3.contains(c) {
-                sum2 += get_priority(c);
-                break;
-            }
-        }
-    }
+    let sum2: i32 = rucksacks.chunks(3).map(|chunk| {
+        get_priority(get_common_item(chunk.to_vec()))
+    }).sum();
 
     println!("Sum2: {}", sum2);
 }
